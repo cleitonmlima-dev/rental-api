@@ -16,6 +16,58 @@ O serviço acompanha o ciclo de vida de uma proposta de locação do início ao 
   - Ao chegar em `ATIVO`, o imóvel passa definitivamente para `ALUGADO`.
   - Toda criação e mudança de estado é registrada no histórico (`GET /api/v1/proposals/:id/history`) e publicada no tópico SNS `rental-proposal-status`, que distribui eventos para 7 filas SQS (uma por status).
 
+## Fluxo de Negócio
+
+```mermaid
+flowchart TD
+    subgraph Cadastros["1. Cadastros"]
+        CUST["Cadastrar Cliente (POST /api/v1/customers)"] --> PROP["Cadastrar Imóvel (POST /api/v1/properties)"]
+        PROP --> IMOV_DISP["Imóvel: DISPONIVEL"]
+    end
+
+    subgraph Criacao["2. Criação da Proposta e Reserva"]
+        IMOV_DISP --> POST_PROP["Criar Proposta (POST /api/v1/proposals + Idempotency-Key)"]
+        POST_PROP -.->|"Chave repetida + mesmo payload"| REPLAY["Replay 201 (retorna resposta original)"]
+        POST_PROP -->|"Reserva na mesma transação"| IMOV_NEG["Imóvel: EM_NEGOCIACAO"]
+        POST_PROP -->|"Nasce em"| NOVA["Proposta: NOVA"]
+    end
+
+    subgraph Esteira["3. Esteira de Estados (PATCH /api/v1/proposals/:id/status)"]
+        NOVA --> ANALISE["Proposta: ANALISE_CREDITO"]
+        ANALISE --> CONTRATO["Proposta: CONTRATO_EMITIDO"]
+        CONTRATO --> ASSINADO["Proposta: ASSINADO"]
+        ASSINADO --> ATIVO["Proposta: ATIVO (Terminal)"]
+
+        NOVA -->|"Cancelar ou Reprovar"| ENCERRADA["Proposta: CANCELADA ou REPROVADA (Terminal)"]
+        ANALISE -->|"Cancelar ou Reprovar"| ENCERRADA
+        CONTRATO -->|"Cancelar ou Reprovar"| ENCERRADA
+        ASSINADO -->|"Cancelar ou Reprovar"| ENCERRADA
+    end
+
+    subgraph Desfecho["4. Atualização do Imóvel"]
+        ATIVO -->|"Na mesma transação"| IMOV_ALUG["Imóvel: ALUGADO (Definitivo)"]
+        ENCERRADA -->|"Libera na mesma transação"| IMOV_DISP
+    end
+
+    subgraph AuditoriaEventos["5. Histórico e Mensageria (em cada criação e mudança de status)"]
+        EVENTO["Estado confirmado no PostgreSQL (NOVA a ATIVO, CANCELADA ou REPROVADA)"]
+        HIST["Trigger grava Histórico (GET /api/v1/proposals/:id/history)"]
+        SNS["Publica ProposalStatusChanged no SNS (rental-proposal-status)"]
+        SQS["Distribui para 7 Filas SQS (1 fila por status)"]
+
+        EVENTO -->|"Na mesma transação"| HIST
+        EVENTO -->|"Após o commit"| SNS
+        SNS -->|"Filtro por atributo status"| SQS
+    end
+
+    NOVA -.-> EVENTO
+    ANALISE -.-> EVENTO
+    CONTRATO -.-> EVENTO
+    ASSINADO -.-> EVENTO
+    ATIVO -.-> EVENTO
+    ENCERRADA -.-> EVENTO
+```
+
 ## Pré-requisitos
 
 - **Node.js** `24.21.0` e **npm** `11`

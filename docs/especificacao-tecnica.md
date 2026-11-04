@@ -423,7 +423,7 @@ Por determinação do responsável pelo projeto, todo desenvolvimento deve gerar
 4. A spec deve conter o link de volta para a ADR. Manter ambos os documentos sincronizados com as mudanças de escopo e as decisões tomadas durante o desenvolvimento.
 5. Concluir a entrega somente com a ADR e a spec presentes, vinculadas e consistentes com o resultado e com as verificações realizadas. Entregar a mudança e os dois documentos em conjunto.
 
-Os registros são numerados continuamente desde 001; a ADR e a spec da entrega usam o mesmo identificador. Para uma nova ADR, usar o próximo número após o maior registro existente: 020. Temas propostos sem arquivo não reservam identificadores. O status de uma decisão fornecida pelo responsável difere do status dos novos detalhes propostos; esta regra não altera o status das demais propostas da especificação.
+Os registros são numerados continuamente desde 001; a ADR e a spec da entrega usam o mesmo identificador. Para uma nova ADR, usar o próximo número após o maior registro existente: 022. Temas propostos sem arquivo não reservam identificadores. O status de uma decisão fornecida pelo responsável difere do status dos novos detalhes propostos; esta regra não altera o status das demais propostas da especificação.
 
 ### 15.2 Catálogo de ADRs
 
@@ -439,7 +439,7 @@ O catálogo contém somente ADRs criadas, com suas specs correspondentes. Os tem
 | [ADR-006](adr/006-propostas-idempotentes.md) | Reserva e replay transacional. | Mantida; snapshot inclui location, criação publica SNS e header validado via pipe na ADR-018; [SPEC-006](specs/006-propostas-idempotentes.md). |
 | [ADR-007](adr/007-esteira-e-trava-temporaria.md) | Esteira e trava Redis. | Esteira mantida; evento substituído por SNS na ADR-010 e trava Redis removida pela ADR-014; [SPEC-007](specs/007-esteira-e-trava-temporaria.md). |
 | [ADR-008](adr/008-observabilidade.md) | OTel, views e dashboards. | Mantida; falhas SNS por estado na ADR-010 e remoção da métrica/painel Redis na ADR-014; [SPEC-008](specs/008-observabilidade.md). |
-| [ADR-009](adr/009-entrega-e-verificacao.md) | Entrega reproduzível. | Aceita; tooling/perfil na ADR-010, integração na ADR-011, sem Redis na ADR-014 e README direto na ADR-017; [SPEC-009](specs/009-entrega-e-verificacao.md). |
+| [ADR-009](adr/009-entrega-e-verificacao.md) | Entrega reproduzível. | Aceita; tooling/perfil na ADR-010, integração na ADR-011, sem Redis na ADR-014 e README direto na ADR-017/ADR-021; [SPEC-009](specs/009-entrega-e-verificacao.md). |
 | [ADR-010](adr/010-legibilidade-orm-contratos-e-mensageria.md) | ORM, Zod, enums, SNS/SQS e simplificação. | Vinte pontos tratados nas fontes; estrutura ajustada pelas ADRs 013/016/018 e Redis removido pela ADR-014; [SPEC-010](specs/010-legibilidade-orm-contratos-e-mensageria.md). |
 | [ADR-011](adr/011-testes-apenas-integracao.md) | Manter exclusivamente testes de integração com node:test. | Aceita; seis suítes de integração vigentes após ADR-014; [SPEC-011](specs/011-testes-apenas-integracao.md). |
 | [ADR-012](adr/012-erros-internos-genericos.md) | Erros internos genéricos sem exposição de infraestrutura. | Aceita; fontes e testes preparados, execução npm/HTTP pendente; [SPEC-012](specs/012-erros-internos-genericos.md). |
@@ -450,6 +450,8 @@ O catálogo contém somente ADRs criadas, com suas specs correspondentes. Os tem
 | [ADR-017](adr/017-simplificacao-readme.md) | Simplificação do `README.md`. | Aceita e concluída; [SPEC-017](specs/017-simplificacao-readme.md). |
 | [ADR-018](adr/018-validacao-idempotency-key-zod-pipe.md) | Validação do header `Idempotency-Key` diretamente via `ZodValidationPipe`. | Aceita; `idempotency-key.ts` removido e erros unificados em `VALIDATION_ERROR`; [SPEC-018](specs/018-validacao-idempotency-key-zod-pipe.md). |
 | [ADR-019](adr/019-gitignore-artefatos-locais.md) | Ignorar `desafio.pdf` e `skills-lock.json` no `.gitignore`. | Aceita e concluída; [SPEC-019](specs/019-gitignore-artefatos-locais.md). |
+| [ADR-020](adr/020-geracao-package-lock.md) | Geração e versionamento do `package-lock.json` para build Docker. | Aceita e concluída; [SPEC-020](specs/020-geracao-package-lock.md). |
+| [ADR-021](adr/021-fluxograma-fluxo-projeto-readme.md) | Fluxograma Mermaid do fluxo do projeto no `README.md`. | Aceita e concluída; [SPEC-021](specs/021-fluxograma-fluxo-projeto-readme.md). |
 
 ### 15.3 Temas da proposta inicial
 
