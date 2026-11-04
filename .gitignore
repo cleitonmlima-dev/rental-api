@@ -1,0 +1,11 @@
+node_modules/
+dist/
+coverage/
+.env
+.env.*
+!.env.example
+*.tsbuildinfo
+*.log
+*.pdf:Zone.Identifier
+desafio.pdf
+skills-lock.json

@@ -1,0 +1,59 @@
+{
+  "name": "rental-pipeline-api",
+  "version": "0.1.0",
+  "private": true,
+  "description": "API de esteira de propostas de locação",
+  "engines": {
+    "node": ">=24.21.0 <25",
+    "npm": ">=11 <12"
+  },
+  "scripts": {
+    "dev": "node --env-file-if-exists=.env --watch --require ts-node/register --require ./src/infra/observability/instrumentation.ts src/main.ts",
+    "prebuild": "node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\"",
+    "build": "tsc -p tsconfig.build.json",
+    "check": "npm run typecheck && npm run lint && npm run build",
+    "start": "node --env-file-if-exists=.env --require ./dist/infra/observability/instrumentation.js dist/main.js",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src test scripts eslint.config.mjs",
+    "lint:fix": "npm run lint -- --fix",
+    "test": "node --env-file-if-exists=.env --require ts-node/register --test --test-concurrency=1 test/integration/*.spec.ts",
+    "test:integration": "npm test",
+    "migration:run": "node --env-file-if-exists=.env --require ts-node/register node_modules/typeorm/cli.js migration:run -d src/infra/database/data-source.ts",
+    "migration:revert": "node --env-file-if-exists=.env --require ts-node/register node_modules/typeorm/cli.js migration:revert -d src/infra/database/data-source.ts",
+    "migration:show": "node --env-file-if-exists=.env --require ts-node/register node_modules/typeorm/cli.js migration:show -d src/infra/database/data-source.ts",
+    "demo": "node --env-file-if-exists=.env scripts/demo.mjs"
+  },
+  "dependencies": {
+    "@aws-sdk/client-sns": "3.1161.0",
+    "@nestjs/common": "11.1.8",
+    "@nestjs/core": "11.1.8",
+    "@nestjs/platform-express": "11.1.8",
+    "@nestjs/swagger": "11.2.1",
+    "@opentelemetry/api": "1.9.0",
+    "@opentelemetry/api-logs": "0.207.0",
+    "@opentelemetry/sdk-node": "0.207.0",
+    "@opentelemetry/resources": "2.2.0",
+    "@opentelemetry/sdk-metrics": "2.2.0",
+    "@opentelemetry/sdk-logs": "0.207.0",
+    "@opentelemetry/sdk-trace-base": "2.2.0",
+    "@opentelemetry/exporter-trace-otlp-http": "0.207.0",
+    "@opentelemetry/exporter-metrics-otlp-http": "0.207.0",
+    "@opentelemetry/exporter-logs-otlp-http": "0.207.0",
+    "@opentelemetry/instrumentation-http": "0.207.0",
+    "@opentelemetry/instrumentation-pg": "0.61.1",
+    "pg": "8.16.3",
+    "reflect-metadata": "0.2.2",
+    "rxjs": "7.8.2",
+    "typeorm": "0.3.27",
+    "zod": "4.1.12"
+  },
+  "devDependencies": {
+    "@aws-sdk/client-sqs": "3.1161.0",
+    "@types/express": "5.0.5",
+    "@types/node": "24.10.0",
+    "eslint": "9.39.1",
+    "ts-node": "10.9.2",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.46.3"
+  }
+}
