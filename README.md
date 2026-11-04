@@ -123,6 +123,48 @@ npm run dev
 | **PostgreSQL** | `127.0.0.1:5432` | Banco `rental` |
 | **PostgreSQL (Testes)** | `127.0.0.1:15432` | Banco `rental_test` (subido com `--profile test`) |
 
+## Observabilidade e Métricas no Grafana
+
+Ao subir a stack, o **Grafana (`http://localhost:3001`)** já inicia com todos os datasources (**PostgreSQL**, **Prometheus**, **Loki** e **Tempo**) e **3 dashboards provisionados automaticamente**, entregando visibilidade de ponta a ponta — da operação comercial à saúde transacional e rastreamento distribuído — sem expor dados sensíveis (as consultas analíticas no banco usam o papel restrito `rental_observer`, com leitura apenas em views agregadas sem PII).
+
+### 1. Dashboard `Rental — Negócio` (Visão Executiva e Comercial)
+
+Acompanha em tempo real o estoque, a conversão do portfólio e o volume de propostas diretamente da fonte de verdade:
+
+| Painel / Indicador | Fonte (`proposal.*`) | Entrega de Valor |
+| --- | --- | --- |
+| **Imóveis por estado — estoque atual** | `proposal.property_counts` | Mostra instantaneamente quantos imóveis estão `DISPONIVEL`, `EM_NEGOCIACAO` (reservados) e `ALUGADO` (taxa de ocupação real). |
+| **Propostas por estado — estoque atual** | `proposal.proposal_counts` | Fotografia completa do funil de locação nos 7 status (`NOVA`, `ANALISE_CREDITO`, `CONTRATO_EMITIDO`, `ASSINADO`, `ATIVO`, `CANCELADA`, `REPROVADA`). |
+| **Novos imóveis por dia (`America/Sao_Paulo`)** | `proposal.property_registrations` | Série histórica de captação diária de novos imóveis no fuso de negócio. |
+| **Encerramentos no período** | `proposal.closures` | Compara perdas de funil por desistência (`CANCELADA`) vs. reprovação (`REPROVADA`) na janela selecionada. |
+
+### 2. Dashboard `Rental — Esteira` (Eficiência Operacional, SLA e Gargalos)
+
+Calcula o lead time real de cada etapa da esteira com base nos intervalos do histórico auditado (`proposal.status_history`), separando etapas já concluídas de propostas que ainda estão paradas:
+
+| Painel / Indicador | Fonte (`proposal.*`) | Entrega de Valor |
+| --- | --- | --- |
+| **Tempo médio concluído por etapa (s)** | `proposal.stage_durations` | Tempo médio que uma proposta leva para atravessar `NOVA`, `ANALISE_CREDITO`, `CONTRATO_EMITIDO` e `ASSINADO`. |
+| **p95 concluído por etapa (s)** | `proposal.stage_durations` | Percentil 95 exato (`percentile_cont(0.95)`) de permanência por etapa, revelando gargalos e caudas longas sem distorção de média. |
+| **Amostras de intervalos concluídos** | `proposal.stage_durations` | Volume de transições concluídas por etapa na janela analisada, dando contexto estatístico para a média e o `p95`. |
+| **Etapas abertas — idade atual (s)** | `proposal.open_stages` | Lista quantas propostas estão abertas em cada etapa agora, com **idade média** e **maior tempo estacionado** (alerta imediato de propostas travadas). |
+
+### 3. Dashboard `Rental — Técnico` (Confiabilidade, Concorrência e Logs ↔ Traces)
+
+Combina métricas OpenTelemetry/Prometheus com logs estruturados no **Loki** e traces distribuídos no **Tempo**:
+
+| Métrica / Painel | Instrumento OpenTelemetry / Fonte | Entrega de Valor |
+| --- | --- | --- |
+| **Requisições por segundo (req/s)** | `rental_http_requests_total` | Taxa de tráfego em tempo real segregada por rota e código HTTP (`method`, `route`, `status`). |
+| **Latência HTTP `p50` / `p95` / `p99` (s)** | `rental_http_duration_seconds` | Monitoramento de experiência e SLO de tempo de resposta por endpoint. |
+| **Erros `5xx` — proporção** | `rental_http_requests_total{status=~"5.."}` | Taxa real de falha interna do serviço isolada de erros de cliente/negócio (`4xx`). |
+| **Conflitos de negócio por código** | `rental_business_conflicts_total` | Mede disputas de concorrência e bloqueios de regra (`PROPERTY_UNAVAILABLE`, `PROPOSAL_TRANSITION_NOT_ALLOWED`, `IDEMPOTENCY_KEY_REUSED`, `CONFLICT`). |
+| **Criações, replay e transições** | `rental_proposal_outcomes_total` | Quantifica criações inéditas (`created`), replays idempotentes (`replayed`) e avanços de esteira (`transitioned`). |
+| **Transações confirmadas e revertidas** | `rental_transactions_total` | Saúde transacional do PostgreSQL por operação (`commit` vs `rollback`). |
+| **Duração transacional `p95` (s)** | `rental_transaction_duration_seconds` | Tempo de execução das transações no banco (incluindo espera por locks pessimistas `FOR NO KEY UPDATE` / `FOR UPDATE`). |
+| **Falhas de publicação SNS** | `rental_publication_failures_total` | Visibilidade imediata caso o envio de eventos pós-commit para o SNS/LocalStack apresente instabilidade. |
+| **Logs — `TraceID` abre o Tempo** | Loki (`{service_name="rental-pipeline-api"}`) + Tempo | Logs JSON correlacionados por `requestId`, `traceId` e `spanId`, permitindo abrir com 1 clique o trace distribuído completo (HTTP + queries SQL + SNS). |
+
 ## Comandos úteis
 
 | Comando | Descrição |
