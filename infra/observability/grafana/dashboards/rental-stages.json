@@ -1,0 +1,137 @@
+{
+  "uid": "rental-stages",
+  "title": "Rental — Esteira",
+  "schemaVersion": 39,
+  "version": 1,
+  "timezone": "America/Sao_Paulo",
+  "refresh": "10s",
+  "time": {
+    "from": "now-7d",
+    "to": "now"
+  },
+  "tags": [
+    "rental"
+  ],
+  "panels": [
+    {
+      "id": 1,
+      "title": "Tempo médio concluído por etapa — segundos",
+      "type": "table",
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 12,
+        "h": 9
+      },
+      "targets": [
+        {
+          "rawSql": "SELECT status, avg(seconds) AS segundos FROM proposal.stage_durations WHERE exited_at >= $__timeFrom() AND exited_at < $__timeTo() GROUP BY status ORDER BY status",
+          "format": "table",
+          "rawQuery": true,
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 2,
+      "title": "p95 concluído por etapa — segundos",
+      "type": "table",
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 0,
+        "w": 12,
+        "h": 9
+      },
+      "targets": [
+        {
+          "rawSql": "SELECT status, percentile_cont(0.95) WITHIN GROUP (ORDER BY seconds) AS segundos FROM proposal.stage_durations WHERE exited_at >= $__timeFrom() AND exited_at < $__timeTo() GROUP BY status ORDER BY status",
+          "format": "table",
+          "rawQuery": true,
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 3,
+      "title": "Amostras de intervalos concluídos",
+      "type": "table",
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 9,
+        "w": 12,
+        "h": 9
+      },
+      "targets": [
+        {
+          "rawSql": "SELECT status, count(*) AS amostras FROM proposal.stage_durations WHERE exited_at >= $__timeFrom() AND exited_at < $__timeTo() GROUP BY status ORDER BY status",
+          "format": "table",
+          "rawQuery": true,
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 4,
+      "title": "Etapas abertas — idade atual em segundos",
+      "type": "table",
+      "datasource": {
+        "type": "postgres",
+        "uid": "postgres"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 9,
+        "w": 12,
+        "h": 9
+      },
+      "targets": [
+        {
+          "rawSql": "SELECT status, count(*) AS abertas, avg(extract(epoch FROM CURRENT_TIMESTAMP - entered_at)) AS idade_media_segundos, max(extract(epoch FROM CURRENT_TIMESTAMP - entered_at)) AS maior_idade_segundos FROM proposal.open_stages GROUP BY status ORDER BY status",
+          "format": "table",
+          "rawQuery": true,
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "options": {}
+    }
+  ]
+}

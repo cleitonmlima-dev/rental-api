@@ -1,0 +1,39 @@
+name: CI
+
+on: [push, pull_request]
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      DATABASE_URL: postgresql://rental_app:rental_app_local@127.0.0.1:5432/rental
+      MIGRATION_DATABASE_URL: postgresql://rental_migrator:rental_migrator_local@127.0.0.1:5432/rental
+      AWS_REGION: us-east-1
+      AWS_ENDPOINT_URL: http://127.0.0.1:4566
+      AWS_ACCESS_KEY_ID: test
+      AWS_SECRET_ACCESS_KEY: test
+      SNS_TOPIC_ARN: arn:aws:sns:us-east-1:000000000000:rental-proposal-status
+      TEST_DATABASE_URL: postgresql://rental_app:rental_app_local@127.0.0.1:15432/rental_test
+      TEST_MIGRATION_DATABASE_URL: postgresql://rental_migrator:rental_migrator_local@127.0.0.1:15432/rental_test
+      TEST_OBSERVER_DATABASE_URL: postgresql://rental_observer:rental_observer_local@127.0.0.1:15432/rental_test
+      OTEL_SDK_DISABLED: 'true'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Exigir lockfile resolvido
+        run: test -f package-lock.json
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run check
+      - run: docker compose --profile test config --quiet
+      - run: docker compose --profile test up -d --wait postgres postgres-test localstack
+      - run: npm run migration:run
+      - run: npm run test:integration
+      - if: always()
+        run: docker compose --profile test down
