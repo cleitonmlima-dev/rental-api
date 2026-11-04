@@ -28,6 +28,8 @@ Fluxograma no README: [ADR-021](../adr/021-fluxograma-fluxo-projeto-readme.md) e
 [SPEC-021](../specs/021-fluxograma-fluxo-projeto-readme.md).  
 Métricas no README: [ADR-022](../adr/022-secao-observabilidade-metricas-grafana-readme.md) e
 [SPEC-022](../specs/022-secao-observabilidade-metricas-grafana-readme.md).  
+Isolamento de métricas Noop: [ADR-023](../adr/023-isolamento-instancias-metricas-noop.md) e
+[SPEC-023](../specs/023-isolamento-instancias-metricas-noop.md).  
 Visão geral: [Especificação funcional e técnica](../especificacao-tecnica.md).
 
 ## 1. Regra de execução
@@ -36,9 +38,9 @@ Cada desenvolvimento exige ADR/spec vinculadas antes da implementação, conform
 [ADR-001](../adr/001-desenvolvimento-com-adr-e-spec.md) e a
 [regra de documentação](../especificacao-tecnica.md#151-regra-de-desenvolvimento--definida).
 ADR/spec 010 reúne os vinte pontos da revisão e antecedeu suas alterações; não há outro par por subitem.
-Os dez pares ADR/spec originais foram acrescidos dos pares 011 a 022 ([ADR-011](../adr/011-testes-apenas-integracao.md) a
-[ADR-022](../adr/022-secao-observabilidade-metricas-grafana-readme.md)).
-Os vinte e dois pares seguem contínuos desde 001; o próximo identificador é 023.
+Os dez pares ADR/spec originais foram acrescidos dos pares 011 a 023 ([ADR-011](../adr/011-testes-apenas-integracao.md) a
+[ADR-023](../adr/023-isolamento-instancias-metricas-noop.md)).
+Os vinte e três pares seguem contínuos desde 001; o próximo identificador é 024.
 
 Fontes preparadas e aceite são estados distintos. Não marcar um incremento como validado antes de executar e
 registrar seus checks. Migrations aplicadas não são reescritas; a inicial foi ajustada porque ainda não foi aplicada.

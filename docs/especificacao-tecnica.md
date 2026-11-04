@@ -423,7 +423,7 @@ Por determinação do responsável pelo projeto, todo desenvolvimento deve gerar
 4. A spec deve conter o link de volta para a ADR. Manter ambos os documentos sincronizados com as mudanças de escopo e as decisões tomadas durante o desenvolvimento.
 5. Concluir a entrega somente com a ADR e a spec presentes, vinculadas e consistentes com o resultado e com as verificações realizadas. Entregar a mudança e os dois documentos em conjunto.
 
-Os registros são numerados continuamente desde 001; a ADR e a spec da entrega usam o mesmo identificador. Para uma nova ADR, usar o próximo número após o maior registro existente: 023. Temas propostos sem arquivo não reservam identificadores. O status de uma decisão fornecida pelo responsável difere do status dos novos detalhes propostos; esta regra não altera o status das demais propostas da especificação.
+Os registros são numerados continuamente desde 001; a ADR e a spec da entrega usam o mesmo identificador. Para uma nova ADR, usar o próximo número após o maior registro existente: 024. Temas propostos sem arquivo não reservam identificadores. O status de uma decisão fornecida pelo responsável difere do status dos novos detalhes propostos; esta regra não altera o status das demais propostas da especificação.
 
 ### 15.2 Catálogo de ADRs
 
@@ -453,6 +453,7 @@ O catálogo contém somente ADRs criadas, com suas specs correspondentes. Os tem
 | [ADR-020](adr/020-geracao-package-lock.md) | Geração e versionamento do `package-lock.json` para build Docker. | Aceita e concluída; [SPEC-020](specs/020-geracao-package-lock.md). |
 | [ADR-021](adr/021-fluxograma-fluxo-projeto-readme.md) | Fluxograma Mermaid do fluxo do projeto no `README.md`. | Aceita e concluída; [SPEC-021](specs/021-fluxograma-fluxo-projeto-readme.md). |
 | [ADR-022](adr/022-secao-observabilidade-metricas-grafana-readme.md) | Seção de observabilidade e métricas do Grafana no `README.md`. | Aceita e concluída; [SPEC-022](specs/022-secao-observabilidade-metricas-grafana-readme.md). |
+| [ADR-023](adr/023-isolamento-instancias-metricas-noop.md) | Isolamento de instâncias de métricas com `NoopMeter` no CI. | Aceita e concluída; [SPEC-023](specs/023-isolamento-instancias-metricas-noop.md). |
 
 ### 15.3 Temas da proposta inicial
 
