@@ -193,7 +193,7 @@ void test('concorrência com conexões PostgreSQL independentes', { timeout: 900
       ), b);
       const errors = (await Promise.all([first, second])).filter((value) => value instanceof QueryFailedError);
       assert.equal(errors.length, 1);
-      assert.equal((errors[0]!.driverError as { code: string }).code, '40P01');
+      assert.equal((errors[0]!.driverError as { code?: string }).code, '40P01');
       assert.equal((await request<Proposal>('GET', `/proposals/${created.body.id}`)).body.status, 'NOVA');
     } finally { await close(a); await close(b); }
   });

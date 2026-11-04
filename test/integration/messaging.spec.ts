@@ -30,7 +30,7 @@ async function messaging(t: TestContext) {
   const sns = new SNSClient(config);
   const sqs = new SQSClient(config);
   const queues = new Map<string, string>();
-  let topicArn: string | undefined;
+  let topicArn: string | undefined = undefined;
   let deleted = false;
   t.after(async () => {
     try {

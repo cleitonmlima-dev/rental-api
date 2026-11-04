@@ -15,7 +15,8 @@ O endpoint `POST /api/v1/proposals` utilizava o helper manual `src/modules/propo
 ## Decisão
 
 - Validar o header `Idempotency-Key` diretamente na assinatura de `ProposalController.create` utilizando
-  `@Headers('idempotency-key', new ZodValidationPipe(idempotencyKeySchema)) key: string`.
+  `@HeaderParam('idempotency-key', new ZodValidationPipe(idempotencyKeySchema)) key: string` (com o decorator
+  `HeaderParam` em `src/shared/http/validation.ts`, já que `@Headers` nativo do NestJS não aceita pipes por parâmetro).
 - Remover o arquivo `src/modules/proposal/idempotency-key.ts`, o schema auxiliar `idempotencyHeadersSchema`, a função
   exportada `validationError` e os códigos de erro específicos `IDEMPOTENCY_KEY_REQUIRED` e `INVALID_IDEMPOTENCY_KEY`,
   unificando falhas de validação do header sob `400 VALIDATION_ERROR` (`apiErrors.validation`).

@@ -30,7 +30,7 @@ export async function fixture(t: TestContext, environment: Record<string, string
   const original = new Map(Object.keys(values).map((key): [string, string | undefined] => [key, process.env[key]]));
   Object.assign(process.env, values);
   const migrations = createDataSource(loadMigrationConfig(process.env));
-  let app: INestApplication | undefined;
+  let app: INestApplication | undefined = undefined;
   t.after(async () => {
     try { await app?.close(); } finally {
       if (migrations.isInitialized) await migrations.destroy();

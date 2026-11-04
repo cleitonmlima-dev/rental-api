@@ -6,13 +6,13 @@ Base: [SPEC-002](002-implementacao-rental-pipeline.md).
 
 ## Objetivo e escopo
 
-Padronizar a validação do header `Idempotency-Key` no `ProposalController.create` usando `@Headers('idempotency-key',
+Padronizar a validação do header `Idempotency-Key` no `ProposalController.create` usando `@HeaderParam('idempotency-key',
 new ZodValidationPipe(idempotencyKeySchema))`, eliminando o parser manual de `rawHeaders` e unificando erros de
 validação de header em `400 VALIDATION_ERROR`.
 
 ## Requisitos e comportamento esperado
 
-- `ProposalController.create` deve receber `@Headers('idempotency-key', new ZodValidationPipe(idempotencyKeySchema))
+- `ProposalController.create` deve receber `@HeaderParam('idempotency-key', new ZodValidationPipe(idempotencyKeySchema))
   key: string` e repassar `key` diretamente para `ProposalService.create(input, key)`.
 - Quando `Idempotency-Key` estiver ausente, vazio, composto apenas por espaços ou acima de 255 caracteres, o
   `ZodValidationPipe` deve rejeitar a requisição com `400 VALIDATION_ERROR` e `details` apontando para o campo
@@ -24,7 +24,7 @@ validação de header em `400 VALIDATION_ERROR`.
 
 | ID | Evidência necessária |
 | --- | --- |
-| S18-01 | `ProposalController.create` valida `idempotency-key` via `@Headers(..., new ZodValidationPipe(idempotencyKeySchema))`. |
+| S18-01 | `ProposalController.create` valida `idempotency-key` via `@HeaderParam(..., new ZodValidationPipe(idempotencyKeySchema))`. |
 | S18-02 | `src/modules/proposal/idempotency-key.ts` e `idempotencyHeadersSchema` foram removidos. |
 | S18-03 | `ApiErrorCode` e `apiErrors` não contêm `IDEMPOTENCY_KEY_REQUIRED` nem `INVALID_IDEMPOTENCY_KEY`. |
 

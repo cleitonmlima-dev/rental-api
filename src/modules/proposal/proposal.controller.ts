@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Headers, Param, Patch, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, Query } from '@nestjs/common';
 import { ApiBody, ApiCreatedResponse, ApiHeader, ApiOkResponse, ApiParam, ApiTags } from '@nestjs/swagger';
 import type { PaginationDto } from '../../shared/http/dtos/pagination.dto';
 import { paginationSchema } from '../../shared/http/schemas/pagination.schema';
@@ -6,7 +6,7 @@ import {
   ApiErrorResponses, ApiQuerySchema, creationSchema, historySchema, inputSchema, pageSchema, proposalSchema,
 } from '../../shared/http/schemas';
 import { uuidSchema } from '../../shared/http/schemas/primitives.schema';
-import { ZodValidationPipe } from '../../shared/http/validation';
+import { HeaderParam, ZodValidationPipe } from '../../shared/http/validation';
 import {
   type CreateProposalDto, type ProposalQueryDto, type TransitionProposalDto,
 } from './dtos/proposal.dto';
@@ -34,7 +34,7 @@ export class ProposalController {
   })
   async create(
     @Body(new ZodValidationPipe(createProposalSchema)) input: CreateProposalDto,
-    @Headers('idempotency-key', new ZodValidationPipe(idempotencyKeySchema)) key: string,
+    @HeaderParam('idempotency-key', new ZodValidationPipe(idempotencyKeySchema)) key: string,
   ): Promise<CreatedProposal> {
     const result = await this.proposals.create(input, key);
     return result.proposal;

@@ -1,6 +1,10 @@
-import type { ArgumentMetadata, PipeTransform } from '@nestjs/common';
+import { createParamDecorator, type ArgumentMetadata, type ExecutionContext, type PipeTransform } from '@nestjs/common';
 import type { z } from 'zod';
 import { ApiError, apiErrors } from './api-error';
+
+export const HeaderParam = createParamDecorator<string>((name, ctx: ExecutionContext) =>
+  ctx.switchToHttp().getRequest<{ headers: Record<string, unknown> }>().headers[name.toLowerCase()],
+);
 
 export class ZodValidationPipe<Schema extends z.ZodType> implements PipeTransform<unknown, z.output<Schema>> {
   constructor(private readonly schema: Schema) {}
